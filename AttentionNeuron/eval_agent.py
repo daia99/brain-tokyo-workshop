@@ -4,6 +4,7 @@ import os
 import util
 import numpy as np
 import time
+from gym.wrappers import Monitor
 
 
 def parse_args():
@@ -18,6 +19,8 @@ def parse_args():
         type=int, default=3)
     parser.add_argument(
         '--seed', help='Random seed for evaluation.', type=int, default=1)
+    parser.add_argument(
+        '--render', action='store_true', help='write video using gym.wrappers.Monitor')
     config, _ = parser.parse_known_args()
     return config
 
@@ -35,6 +38,8 @@ def main(config):
     time_costs = []
     for ep in range(config.n_episodes):
         start_time = time.perf_counter()
+        if config.render:
+            task.env = Monitor(task.env, './video', force=True)
         reward = task.rollout(solution=solution, evaluation=True)
         time_cost = time.perf_counter() - start_time
         rewards.append(reward)
